@@ -20,23 +20,58 @@ void	ft_putchar(char c)
 
 t_ftpf	s_init(void)
 {
+	t_ftpf s_arg;
+
 	s_arg.pre = -1;
 	s_arg.width = 0;
-	s_arg.zero = 0;
-	s_arg.minus = 0;
+	s_arg.flag = 0;
 	s_arg.type = 0;
 
 	return (s_arg);
 }
 
+int is_valid_type(char c_input)
+{
+	if (c_input == 'c' || c_input == 's' || c_input == 'p' || c_input == 'd' ||
+		c_input == 'i' || c_input == 'u' || c_input == 'x' || c_input == 'X' ||
+		c_input == '%')
+		return (1);
+	return (0);
+}
+
+int	f_check(const char *input, int pos)
+{
+	return (0);
+}
+
+int get_pre(const char *input, int pos)
+{
+	while (!(is_valid_type(input[pos])))
+	{
+		pos++;
+		if (input[pos] == '.')
+		{}
+	}
+	return (0);
+}
+
+int	get_width(const char *input, int pos)
+{
+	return (0);
+}
+
+char get_type(const char *input, int pos)
+{
+	return (0);
+}
+
 t_ftpf	s_build(t_ftpf s_arg, const char *input, size_t pos)
 {
-	t_ftpf s_arg;
 
 	s_arg = s_init();
 	s_arg.flag = f_check(input, pos);
-	s_arg.pre = get_pre(input, pos);
 	s_arg.width = get_width(input, pos);
+	s_arg.pre = get_pre(input, pos);
 	s_arg.type = get_type(input, pos);
 
 	return (s_arg);
@@ -47,12 +82,17 @@ int		input_width(const char *input, int pos)
 	int	arg_w;
 
 	arg_w = 0;
-	while (!(is_conv(input[pos])))
+	while (!(is_valid_type(input[pos])))
 	{
 		pos++;
 		arg_w++;
 	}
-	return (arg_w);
+	return (++arg_w);
+}
+
+void	s_print(t_ftpf s_arg, va_list ap)
+{
+	
 }
 int	pf_parser(const char *input, va_list ap)
 {
@@ -69,7 +109,7 @@ int	pf_parser(const char *input, va_list ap)
 			s_arg = s_build(s_arg, input, pos);
 			s_print(s_arg, ap);
 			p_width = s_arg.width;
-			pos += input_width(input, pos)
+			pos += input_width(input, pos);
 		}
 		else
 		{
@@ -98,7 +138,7 @@ int	main()
 	//unsigned int u = 1000;
 	//int p = 1;
 	char* str = "bonjour";
-	ft_printf("yo\n", str);
+	ft_printf("%y%.0o\n", str);
 	//printf("%.15d\n", str, u);
 	return (0);
 }
