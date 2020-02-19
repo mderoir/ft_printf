@@ -18,6 +18,13 @@ void	ft_putchar(char c)
 	write(1, &c, 1);
 }
 
+int		is_digit(char c)
+{
+	if (c >= 48 && c <= 57)
+		return (1);
+	return (0);
+}
+
 t_ftpf	s_init(void)
 {
 	t_ftpf s_arg;
@@ -33,49 +40,69 @@ t_ftpf	s_init(void)
 int is_valid_type(char c_input)
 {
 	if (c_input == 'c' || c_input == 's' || c_input == 'p' || c_input == 'd' ||
-		c_input == 'i' || c_input == 'u' || c_input == 'x' || c_input == 'X' ||
-		c_input == '%')
+		c_input == 'i' || c_input == 'u' || c_input == 'x' || c_input == 'X')
 		return (1);
 	return (0);
 }
 
 int	f_check(const char *input, int pos)
 {
-	return (10);
-	return (11);
-	return (1);
+	pos++;
+	if (input[pos] == '-')
+		return (F_LIFT);
+	else if (input[pos] == '.')
+		return (F_PREC);
+	else if (input[pos] == '0' && !(is_digit(input[pos - 1])))	
+		return (F_ZERO);
+	else if (input[pos] == ' ')	
+		return (F_SPACE);
+	else if (is_valid_type(input[pos]))	
+		return (F_TYPE);
+	return (0);
 }
 
-int get_pre(const char *input, int pos)
+int get_pre(const char *input, int pos, va_list ap)
 {
-	while (!(is_valid_type(input[pos])))
-	{
+	int pre;
+	
+	pre = 0;
+	while (!(is_digit(input[pos]) || input[pos] == '*'))
 		pos++;
-		if (input[pos] == '.')
-		{}
-	}
-	return (0);
+	input[pos] == '*' ? pre = va_arg(ap, int) : 0;
+	while (is_digit(input[pos]))
+		pre = pre * 10 + input[pos++] - '0';
+	return (pre);
 }
 
-int	get_width(const char *input, int pos)
+int	get_width(const char *input, int pos, va_list ap)
 {
-	return (0);
+	int width;
+
+	width = 0;
+	while (!(is_digit(input[pos]) || input[pos] == '*'))
+		pos++;
+	input[pos] == '*' ? width = va_arg(ap, int) : 0;
+	while (is_digit(input[pos]))
+		width = width * 10 + input[pos++] - '0';
+	return (width);
 }
 
 char get_type(const char *input, int pos)
 {
-	return (0);
+	while (!(is_valid_type(input[pos])))
+		pos++;
+	return (input[pos]);
 }
 
-t_ftpf	s_build(t_ftpf s_arg, const char *input, size_t pos)
+t_ftpf	s_build(t_ftpf s_arg, const char *input, size_t pos, va_list ap)
 {
 
 	s_arg = s_init();
 	s_arg.flag = f_check(input, pos);
-	s_arg.width = get_width(input, pos);
-	s_arg.pre = get_pre(input, pos);
+	s_arg.width = get_width(input, pos, ap);
+	if (s_arg.flag == F_PREC)
+		s_arg.pre = get_pre(input, pos, ap);
 	s_arg.type = get_type(input, pos);
-
 	return (s_arg);
 }
 
@@ -94,7 +121,11 @@ int		input_width(const char *input, int pos)
 
 void	s_print(t_ftpf s_arg, va_list ap)
 {
-	
+	printf("%s\n", "coucou mon chaton");
+	printf("TYPE : %c\n", s_arg.type);
+	printf("FLAG : %c\n", s_arg.flag);
+	printf("WIDTH : %d\n", s_arg.width);
+	printf("PRE : %d\n", s_arg.pre);
 }
 
 int	input_parser(const char *input, va_list ap)
@@ -109,9 +140,9 @@ int	input_parser(const char *input, va_list ap)
 	{
 		if (input[pos] == '%')
 		{
-			s_arg = s_build(s_arg, input, pos);
+			s_arg = s_build(s_arg, input, pos, ap);
 			s_print(s_arg, ap);
-			p_width = s_arg.width;
+			p_width += s_arg.width;
 			pos += input_width(input, pos);
 		}
 		else
@@ -137,7 +168,7 @@ int	ft_printf(const char *input, ...)
 
 int	main()
 {
-	ft_printf("%y%.0o\n");
+	ft_printf("%.12d%012d\n");
 	//printf("%.15d\n");
 	return (0);
 }
