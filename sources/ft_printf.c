@@ -41,7 +41,9 @@ int is_valid_type(char c_input)
 
 int	f_check(const char *input, int pos)
 {
-	return (0);
+	return (10);
+	return (11);
+	return (1);
 }
 
 int get_pre(const char *input, int pos)
@@ -94,7 +96,8 @@ void	s_print(t_ftpf s_arg, va_list ap)
 {
 	
 }
-int	pf_parser(const char *input, va_list ap)
+
+int	input_parser(const char *input, va_list ap)
 {
 	size_t	pos;
 	size_t	p_width;
@@ -119,7 +122,6 @@ int	pf_parser(const char *input, va_list ap)
 		}
 	}
 	return (p_width);
-
 }
 
 int	ft_printf(const char *input, ...)
@@ -128,17 +130,15 @@ int	ft_printf(const char *input, ...)
 	va_list	ap;
 
 	va_start(ap, input);
-	p_width = pf_parser(input, ap);	
+	p_width = input_parser(input, ap);	
 	va_end(ap);
 	return (p_width);
 }
 
 int	main()
 {
-	//unsigned int u = 1000;
-	//int p = 1;
-	char* str = "bonjour";
-	ft_printf("%y%.0o\n", str);
-	//printf("%.15d\n", str, u);
+	ft_printf("%y%.0o\n");
+	//printf("%.15d\n");
 	return (0);
 }
+ 
