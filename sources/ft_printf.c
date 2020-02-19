@@ -13,113 +13,84 @@
 #include "../includes/ft_printf.h"
 #include <stdio.h>
 
-int 	is_flag(char f)
+void	ft_putchar(char c)
 {
-	if (f == '0' || f == '*' || f == '-' || f == '.')
-		return (1);
-	return(0);
+	write(1, &c, 1);
 }
 
-int 	is_conv(char f)
+t_ftpf	s_init(void)
 {
-	if (f == 'd' || f == 'i' || f == 'u' || f == 's'
-		|| f == 'c' || f == 'p' || f == 'x' || f == 'X')
-		return (1);
-	return(0);
+	s_arg.pre = -1;
+	s_arg.width = 0;
+	s_arg.zero = 0;
+	s_arg.minus = 0;
+	s_arg.type = 0;
+
+	return (s_arg);
 }
 
-int		check_flag(char *f, va_list ap, int w_limit)
+t_ftpf	s_build(t_ftpf s_arg, const char *input, size_t pos)
 {
-	int ret;
-	int i;
-	char len_arg[255];
+	t_ftpf s_arg;
 
-	ret = 0;
-	i = 0;
-	if (*f == '0' || *f == '.')
-		ret += flag_null(f, ap, len_arg, i, ret, w_limit);
-	else if (*f == '*')
-		ret += flag_star(ap, ret, w_limit);
-	else
-		ret += flag_width(f, len_arg, i, ret, w_limit);
-	return(ret);
+	s_arg = s_init();
+	s_arg.flag = f_check(input, pos);
+	s_arg.pre = get_pre(input, pos);
+	s_arg.width = get_width(input, pos);
+	s_arg.type = get_type(input, pos);
+
+	return (s_arg);
 }
 
-char	*convert_str(char *t, va_list ap, char *temp)
+int		input_width(const char *input, int pos)
 {
-	int i;
- // POUR GERER LES TYPES DE FLAGS AVEC LES TYPES DE CONVERSIONS
- // POSSIBILITE D'AJOUTER UN FLAG QUI SPECIFIE DANS L'ENTREE DE
- // LA FONCTION CHECK FLAG S'IL S'AGIT DE CHIFFRES OU NON.   |
- // A IMPLEMENTER UNIQUEMENT DANS LA PREMIER CONDITION, LA	  |
- // VALEUR PAR DEFAUT ETANT 0.                                |
-	i = 0;
-	// PAR DEFAUT = ISCHIFFRE = 0
+	int	arg_w;
 
-	while (!(is_conv(t[i])))
-		i++;
-	if (t[i] == 'd' || t[i] == 'i' || t[i] == 'u')
-		temp = ft_itoa(va_arg(ap, int));
-		// CHECK_FLAG(ISCHIFFRE = 1)
-	else if (t[i] == 's')
-		temp = ft_strdup(va_arg(ap, char*));
-	//else if (t == 'c')
-	//	temp = ft_putchar(va_arg(ap, int));
-	//else if (t == 'p')
-	//	temp = ft_print_adress(va_arg(ap, long long int));
-	//else if (t == 'x' || t == 'X')
-	//	temp = ft_putnbr_hex(va_arg(ap, long long int), t);
-
-	// !! METTRE CHECK FLAG DANS CETTE FONCTION.
-	// !! A LA FIN.
-	if (temp)
-		return (temp);
-	else
-		return (NULL);
-}
-
-int	ft_printf(const char *str, ...)
-{
-	int i;
-	i = 0;
-	char *temp;
-	va_list	ap;
-	va_start(ap, str);
-	// CHECK ERROR EN DEBUT DE PROGRAMME OU DANS LA BOUCLE ?
-	while (str[i])
+	arg_w = 0;
+	while (!(is_conv(input[pos])))
 	{
-		if (str[i] == '%' && is_flag(str[i + 1] ))
-		{
-			temp = convert_str((char *)str, ap, temp);
-			i += check_flag((char*)&str[i + 1], ap, ft_strlen(temp));
-				if (*temp)
-					ft_putstr(temp);
-			i++;
-		}
-		else if (str[i] == '%' && ft_isdigit(str[i + 1]))
-		{
-			temp = convert_str((char *)str, ap, temp);
-			i += check_flag((char*)&str[i + 1], ap, ft_strlen(temp));
-				if (*temp)
-					ft_putstr(temp);
-			i++;
-		}
-		else if (str[i] == '%' && is_conv(str[i + 1]))
-		{
-			temp = convert_str((char *)str, ap, temp);
-				if (*temp)
-						ft_putstr(temp);
-			i++;
-		}
-		else if (str[i] == '\n')
-			ft_putchar('\n');
-		else
-			ft_putchar(str[i]);
-		i++;
-	// QUAND FREE ?
+		pos++;
+		arg_w++;
 	}
+	return (arg_w);
+}
+int	pf_parser(const char *input, va_list ap)
+{
+	size_t	pos;
+	size_t	p_width;
+	t_ftpf	s_arg;
+
+	pos = 0;
+	p_width = 0;
+	while (input[pos])
+	{
+		if (input[pos] == '%')
+		{
+			s_arg = s_build(s_arg, input, pos);
+			s_print(s_arg, ap);
+			p_width = s_arg.width;
+			pos += input_width(input, pos)
+		}
+		else
+		{
+			ft_putchar(input[pos]);
+			pos++;
+			p_width++;
+		}
+	}
+	return (p_width);
+
+}
+
+int	ft_printf(const char *input, ...)
+{
+	int p_width;
+	va_list	ap;
+
+	va_start(ap, input);
+	p_width = pf_parser(input, ap);	
 	va_end(ap);
-	return (0);
+	return (p_width);
 }
 
 int	main()
@@ -127,7 +98,7 @@ int	main()
 	//unsigned int u = 1000;
 	//int p = 1;
 	char* str = "bonjour";
-	ft_printf("%s\n", str);
+	ft_printf("yo\n", str);
 	//printf("%.15d\n", str, u);
 	return (0);
 }
