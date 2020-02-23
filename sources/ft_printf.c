@@ -12,10 +12,32 @@
 
 #include "../includes/ft_printf.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void	ft_putchar(char c)
 {
 	write(1, &c, 1);
+}
+
+void	ft_pf_putchar(t_ftpf s_arg, va_list ap)
+{
+	int width;
+
+	width = s_arg.width;
+	if (s_arg.flag == F_LIFT)
+	{
+		ft_putchar(va_arg(ap, int));
+		while (--width)
+			ft_putchar(' ');
+	}
+	else if (s_arg.flag == F_SPACE)
+	{
+		while (--width - 1)
+			ft_putchar(' ');
+		ft_putchar(va_arg(ap, int));
+	}
+	else
+		ft_putchar(va_arg(ap, int));
 }
 
 int		is_digit(char c)
@@ -25,11 +47,32 @@ int		is_digit(char c)
 	return (0);
 }
 
+char	*ft_strdup(char *src)
+{
+	char	*new;
+	int		i;
+	int		size;
+
+	size = 0;
+	while (src[size])
+		++size;
+	if (!(new = malloc(sizeof(char) * (size + 1))))
+		return (NULL);
+	i = 0;
+	while (src[i])
+	{
+		new[i] = src[i];
+		i++;
+	}
+	new[i] = '\0';
+	return (new);
+}
+
 t_ftpf	s_init(void)
 {
 	t_ftpf s_arg;
 
-	s_arg.pre = -1;
+	s_arg.pre = 0;
 	s_arg.width = 0;
 	s_arg.flag = 0;
 	s_arg.type = 0;
@@ -54,7 +97,7 @@ int	f_check(const char *input, int pos)
 		return (F_PREC);
 	else if (input[pos] == '0' && !(is_digit(input[pos - 1])))	
 		return (F_ZERO);
-	else if (input[pos] == ' ')	
+	else if (is_digit(input[pos]) || input[pos] == ' ')	
 		return (F_SPACE);
 	else if (is_valid_type(input[pos]))	
 		return (F_TYPE);
@@ -64,11 +107,11 @@ int	f_check(const char *input, int pos)
 int get_pre(const char *input, int pos, va_list ap)
 {
 	int pre;
-	
+
 	pre = 0;
-	while (!(is_digit(input[pos]) || input[pos] == '*'))
+	while (input[pos] && input[pos] != '*' && !(is_digit(input[pos])))
 		pos++;
-	input[pos] == '*' ? pre = va_arg(ap, int) : 0;
+	input[pos] == '*' && input[pos - 1] == '.' ? pre = va_arg(ap, int) : 0;
 	while (is_digit(input[pos]))
 		pre = pre * 10 + input[pos++] - '0';
 	return (pre);
@@ -79,19 +122,24 @@ int	get_width(const char *input, int pos, va_list ap)
 	int width;
 
 	width = 0;
-	while (!(is_digit(input[pos]) || input[pos] == '*'))
+	while (input[pos] && input[pos] != '*' && !(is_digit(input[pos])))
 		pos++;
-	input[pos] == '*' ? width = va_arg(ap, int) : 0;
-	while (is_digit(input[pos]))
+	if (!(is_digit(input[pos - 1])) && input[pos] == '0' && input[pos])
+		pos++;
+	input[pos] == '*' && input[pos - 1] != '.' ? width = va_arg(ap, int) : 0;
+	while (is_digit(input[pos]) && input[pos])
 		width = width * 10 + input[pos++] - '0';
 	return (width);
 }
 
 char get_type(const char *input, int pos)
 {
-	while (!(is_valid_type(input[pos])))
+	char type;
+
+	while (!(is_valid_type(input[pos])) && input[pos])
 		pos++;
-	return (input[pos]);
+	is_valid_type(input[pos]) ? type = input[pos] : 0 ;
+	return (type);
 }
 
 t_ftpf	s_build(t_ftpf s_arg, const char *input, size_t pos, va_list ap)
@@ -103,6 +151,7 @@ t_ftpf	s_build(t_ftpf s_arg, const char *input, size_t pos, va_list ap)
 	if (s_arg.flag == F_PREC)
 		s_arg.pre = get_pre(input, pos, ap);
 	s_arg.type = get_type(input, pos);
+	//s_arg.data = va_arg(ap, void*);
 	return (s_arg);
 }
 
@@ -111,7 +160,7 @@ int		input_width(const char *input, int pos)
 	int	arg_w;
 
 	arg_w = 0;
-	while (!(is_valid_type(input[pos])))
+	while (!(is_valid_type(input[pos])) && input[pos])
 	{
 		pos++;
 		arg_w++;
@@ -121,11 +170,14 @@ int		input_width(const char *input, int pos)
 
 void	s_print(t_ftpf s_arg, va_list ap)
 {
-	printf("%s\n", "coucou mon chaton");
+	printf("\n%s\n\n", "coucou mon chaton");
 	printf("TYPE : %c\n", s_arg.type);
 	printf("FLAG : %c\n", s_arg.flag);
 	printf("WIDTH : %d\n", s_arg.width);
 	printf("PRE : %d\n", s_arg.pre);
+	//printf("ARG : %\n", (int)s_arg.data);
+	if (s_arg.type == 'c')
+		ft_pf_putchar(s_arg, ap);
 }
 
 int	input_parser(const char *input, va_list ap)
@@ -163,12 +215,13 @@ int	ft_printf(const char *input, ...)
 	va_start(ap, input);
 	p_width = input_parser(input, ap);	
 	va_end(ap);
+	printf("RET VALUE : %d\n\n", p_width);
 	return (p_width);
 }
 
 int	main()
 {
-	ft_printf("%.12d%012d\n");
+	ft_printf("%c\n", 'e');
 	//printf("%.15d\n");
 	return (0);
 }
