@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/11 10:35:56 by bclerc            #+#    #+#             */
-/*   Updated: 2020/03/04 15:53:51 by marvin           ###   ########.fr       */
+/*   Updated: 2020/03/04 16:20:40 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,26 +29,22 @@ int		input_width(const char *input, int pos)
 
 void	s_print(t_ftpf s_arg, va_list ap)
 {
-	 printf("TYPE : %c\n", s_arg.type);
-	 printf("FLAG : %c\n", s_arg.flag);
-	 printf("WIDTH : %d\n", s_arg.width);
-	 printf("PRE : %d\n", s_arg.pre);
 	if (s_arg.type == 'c')
 		ft_printchar(s_arg);
 	if (s_arg.type == 's')
 		ft_printstring(s_arg);
-	// if (s_arg.type == 'd')
-	// 	ft_printstring(s_arg, ap);
-	// if (s_arg.type == 'i')
-	// 	ft_printstring(s_arg, ap);
-	// if (s_arg.type == 'u')
-	// 	ft_printstring(s_arg, ap);
-	// if (s_arg.type == 'x')
-	// 	ft_printstring(s_arg, ap);
-	// if (s_arg.type == 'X')
-	// 	ft_printstring(s_arg, ap);
-	// if (s_arg.type == 'p')
-	// 	ft_printstring(s_arg, ap);
+	if (s_arg.type == 'd')
+		ft_printstring(s_arg);
+	if (s_arg.type == 'i')
+		ft_printstring(s_arg);
+	if (s_arg.type == 'u')
+		ft_printstring(s_arg);
+	if (s_arg.type == 'x')
+		ft_printstring(s_arg);
+	if (s_arg.type == 'X')
+		ft_printstring(s_arg);
+	if (s_arg.type == 'p')
+		ft_printstring(s_arg);
 }
 
 int	input_parser(const char *input, va_list ap)
@@ -86,17 +82,20 @@ int	ft_printf(const char *input, ...)
 	va_start(ap, input);
 	p_width = input_parser(input, ap);	
 	va_end(ap);
-	printf("RET VALUE : %d\n\n", p_width);
+	printf("RET VALUE : %d\n", p_width);
 	return (p_width);
 }
 
 int	main()
 {
 	int ret;
+	int nb;
+
+	nb = 42;
 	char *str = "Chaton des booooois";
-	ft_printf("PRINTF : %c\n%s\n%s\n", 'o', str, "Woooooooh");
-	ret = printf("PRINTF : %c\n%s\n%s\n", 'o', str, "Woooooooh");
-	printf("RET VALUE : %d\n\n", ret);
+	ft_printf("CHAR : %c\nSTRING : %s\nINT : %d %i %u\nHEXA : %x %X\nADRESS : %p\n", 'o', str, nb, nb, nb, nb, nb, str);
+	ret = printf("CHAR : %c\nSTRING : %s\nINT : %d %i %u\nHEXA : %x %X\nADRESS : %p\n", 'o', str, nb, nb, nb, nb, nb, str);
+	printf("RET VALUE : %d\n", ret);
 	
 
 	return (0);
