@@ -40,11 +40,9 @@ t_ftpf nbr_to_str_hex(t_ftpf s_arg, va_list ap)
 t_ftpf str_to_hex(t_ftpf s_arg, va_list ap)
 {
     char *tmp;
-    intptr_t add;
 
     tmp = va_arg(ap, void *);
-    add = *tmp;
-    s_arg.len = ft_intlen_base(add, 16);
+    s_arg.len = 14;
     s_arg.str = ft_ptr_adress((intptr_t)tmp);
     return (s_arg);
 }
