@@ -1,60 +1,49 @@
-NAME = ft_printf
-PROJECT_NAME = ft_printf
+LIBFT = ./libft/libft.a
 
-SOURCES_FOLDER = sources/
-INCLUDES_FOLDER = includes/
-OBJECTS_FOLDER = ./
+N_TEMP = temp.a
 
-LIBS = libft
+NAME = libftprintf.a
 
-SOURCES = \
-		ft_printf.c
-OBJECTS = $(SOURCES:.c=.o)
+SRCS    = ./ft_printf.c \
+                ./sources/type_build.c \
+            	./sources/flag_handler.c \
+            	./sources/input_parser.c \
+            	./sources/p_adress.c	\
+				./sources/p_char.c	\
+				./sources/p_hexa.c	\
+				./sources/p_int.c	\
+				./sources/p_percent.c	\
+				./sources/p_precision.c	\
+				./sources/p_string.c	\
+				./sources/p_unsint.c	\
+				./sources/p_width.c	\
 
-FSANITIZE = -fsanitize=address
-FLAGS = -g
-CC = clang
 
-NO_COLOR =		\033[38;5;15m
-OK_COLOR =		\033[38;5;2m
-ERROR_COLOR =	\033[38;5;1m
-WARN_COLOR =	\033[38;5;3m
-SILENT_COLOR =	\033[38;5;245m
-INFO_COLOR =	\033[38;5;140m
+CC = gcc
 
-.PHONY: all re clean fclean libft force doclean
+FLAGS = -c -Wall -Wextra -Werror
 
-all: $(NAME)
+INCLUDES = -I./includes/
 
-$(LIBS):
-	@printf "$(NO_COLOR)All objects for $(INFO_COLOR)$(PROJECT_NAME) $(NO_COLOR)where successfully created.\n"
-	@printf "\n$(NO_COLOR)-------- $(INFO_COLOR)Libft $(NO_COLOR)--------\n"
-	@make -C $(@)
-	@printf "$(NO_COLOR)-----------------------\n\n"
+OBJS = $(SRCS:.c=.o)
 
-$(NAME): $(OBJECTS) $(LIBS)
-	@$(CC) $(FLAGS) -I$(INCLUDES_FOLDER)  -o $(NAME)  -L libft/ -L /usr/local/lib -lmlx -framework OpenGL -framework AppKit -g -lft $(OBJECTS)
-	@printf "$(INFO_COLOR)$(NAME) $(NO_COLOR)successfully compiled. $(OK_COLOR)✓$(NO_COLOR)\n"
+$(NAME): $(OBJS)
+	$(MAKE) -C ./libft
+	cp libft/libft.a $(NAME)
+	$(CC) $(FLAGS) $(INCLUDES) $(SRCS)
+	ar -rcs $(NAME) $(OBJS)
 
-force: $(OBJECTS)
-	@printf "$(NO_COLOR)All objects for $(INFO_COLOR)$(PROJECT_NAME) $(NO_COLOR)where successfully created.\n"
-	@$(CC) $(FLAGS) -I$(INCLUDES_FOLDER) -o $(NAME) $(OBJECTS) -L libft/ -lft
-	@printf "$(INFO_COLOR)$(NAME) $(NO_COLOR)successfully compiled. $(OK_COLOR)✓$(NO_COLOR)\n"
+all : $(NAME)
 
-%.o: %.c
-	@$(CC) $(FLAGS) -I$(INCLUDES_FOLDER) -c $< -o $@
-	@printf "$(NO_COLOR)Creating $(INFO_COLOR)%-30s $(OK_COLOR)✓$(NO_COLOR)\r" "$@"
+clean :
+	$(MAKE) clean -C ./libft
+	rm -rf $(SURPL_O) 
+	rm -rf $(OBJS)
 
-clean:
-	@make -C $(LIBS) clean
-	@rm -f $(OBJECTS)
-	@printf "$(INFO_COLOR)$(PROJECT_NAME) $(NO_COLOR)Removed all objects$(NO_COLOR).\n"
+fclean : clean
+	$(MAKE) fclean -C ./libft
+	rm -rf $(NAME)
 
-fclean: clean
-	@make -C $(LIBS) fclean
-	@rm -f $(NAME)
-	@printf "$(INFO_COLOR)$(PROJECT_NAME) $(NO_COLOR)Removed $(INFO_COLOR)$(NAME)$(NO_COLOR).\n"
+re : fclean all
 
-doclean: all clean
-
-re: fclean all
+.PHONY:     all clean fclean re
